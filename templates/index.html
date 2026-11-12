@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi Fare Predictator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet.js CSS & JS for Interactive Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur fixed top-0 w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 p-2 rounded-lg text-slate-950">
+                    <i data-lucide="car" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-wide">NYC Taxi Fare <span class="text-amber-500">AI Predictor</span></h1>
+            </div>
+            <span class="text-xs bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">Deep Learning Model v1.0</span>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="max-w-7xl mx-auto px-4 pt-24 pb-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Controls & Input Panel -->
+        <div class="lg:col-span-5 space-y-6">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 backdrop-blur">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="sliders" class="w-5 h-5 text-amber-500"></i> Trip Parameters
+                </h2>
+
+                <form id="fareForm" class="space-y-4">
+                    <!-- Pickup Datetime -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Pickup Date & Time</label>
+                        <input type="datetime-local" id="pickup_datetime" required
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
+                    </div>
+
+                    <!-- Passenger Count -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Passenger Count</label>
+                        <select id="passenger_count" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 transition">
+                            <option value="1">1 Passenger</option>
+                            <option value="2">2 Passengers</option>
+                            <option value="3">3 Passengers</option>
+                            <option value="4">4 Passengers</option>
+                            <option value="5">5+ Passengers (Van)</option>
+                        </select>
+                    </div>
+
+                    <!-- Coordinate Display Fields -->
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-emerald-400 font-bold tracking-wider uppercase block mb-1">● Pickup Location</span>
+                            <div id="pickup_display" class="text-xs font-mono text-slate-300">Click map to set</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-[10px] text-rose-400 font-bold tracking-wider uppercase block mb-1">● Dropoff Location</span>
+                            <div id="dropoff_display" class="text-xs font-mono text-slate-300">Click map to set</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-3 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10">
+                        <i data-lucide="calculator" class="w-4 h-4"></i> Calculate Fare Estimate
+                    </button>
+                </form>
+            </div>
+
+            <!-- Output Display Card -->
+            <div id="resultCard" class="hidden bg-gradient-to-br from-slate-800 to-amber-950/30 border border-amber-500/30 rounded-2xl p-6">
+                <span class="text-xs text-amber-400 font-semibold uppercase tracking-wider">Estimated Fare</span>
+                <div class="text-4xl font-extrabold text-white my-2" id="res_fare">$0.00</div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-700/50 text-xs">
+                    <div>
+                        <span class="text-slate-400 block">Distance:</span>
+                        <span class="font-semibold text-slate-200" id="res_dist">0 mi</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Surcharges:</span>
+                        <span class="font-semibold text-slate-200" id="res_surcharge">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Map Panel -->
+        <div class="lg:col-span-7">
+            <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-4 backdrop-blur h-[550px] flex flex-col">
+                <div class="flex items-center justify-between mb-3 px-2">
+                    <span class="text-xs text-slate-400">Click on the map to place <span class="text-emerald-400 font-bold">Pickup</span> and <span class="text-rose-400 font-bold">Dropoff</span> markers.</span>
+                    <button id="resetMap" class="text-xs text-amber-500 hover:underline">Reset Markers</button>
+                </div>
+                <div id="map" class="w-full flex-1 rounded-xl z-10"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    lucide.createIcons();
+
+    // Default Coordinates (Times Square -> JFK Airport)
+    let pickupCoords = [40.7580, -73.9855];
+    let dropoffCoords = [40.6413, -73.7781];
+
+    // Initialize datetime picker
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    document.getElementById('pickup_datetime').value = now.toISOString().slice(0, 16);
+
+    // Initialize Leaflet Map
+    const map = L.map('map').setView([40.730610, -73.935242], 11);
+
+    // Free OpenStreetMap Tile Provider (No API Key Needed)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Create Custom Markers
+    let pickupMarker = L.marker(pickupCoords, { draggable: true }).addTo(map).bindPopup("Pickup Location");
+    let dropoffMarker = L.marker(dropoffCoords, { draggable: true }).addTo(map).bindPopup("Dropoff Location");
+
+    // Polyline connecting the points
+    let polyline = L.polyline([pickupCoords, dropoffCoords], {
+        color: '#f59e0b',
+        weight: 4,
+        dashArray: '6, 6'
+    }).addTo(map);
+
+    // Function to synchronize coordinate fields and line
+    function updateMapState() {
+        document.getElementById('pickup_display').innerText = `${pickupCoords[0].toFixed(4)}, ${pickupCoords[1].toFixed(4)}`;
+        document.getElementById('dropoff_display').innerText = `${dropoffCoords[0].toFixed(4)}, ${dropoffCoords[1].toFixed(4)}`;
+        polyline.setLatLngs([pickupCoords, dropoffCoords]);
+    }
+
+    // Drag events for Pickup Marker
+    pickupMarker.on('drag', function(e) {
+        const latlng = e.target.getLatLng();
+        pickupCoords = [latlng.lat, latlng.lng];
+        updateMapState();
+    });
+
+    // Drag events for Dropoff Marker
+    dropoffMarker.on('drag', function(e) {
+        const latlng = e.target.getLatLng();
+        dropoffCoords = [latlng.lat, latlng.lng];
+        updateMapState();
+    });
+
+    // Map Click Handler (Alternate clicks between setting Pickup & Dropoff)
+    let clickState = 0;
+    map.on('click', function(e) {
+        if (clickState === 0) {
+            pickupCoords = [e.latlng.lat, e.latlng.lng];
+            pickupMarker.setLatLng(pickupCoords);
+            clickState = 1;
+        } else {
+            dropoffCoords = [e.latlng.lat, e.latlng.lng];
+            dropoffMarker.setLatLng(dropoffCoords);
+            clickState = 0;
+        }
+        updateMapState();
+    });
+
+    // Reset Button Logic
+    document.getElementById('resetMap').addEventListener('click', () => {
+        clickState = 0;
+        pickupCoords = [40.7580, -73.9855];
+        dropoffCoords = [40.6413, -73.7781];
+        pickupMarker.setLatLng(pickupCoords);
+        dropoffMarker.setLatLng(dropoffCoords);
+        map.setView([40.730610, -73.935242], 11);
+        updateMapState();
+    });
+
+    // Form Submission Logic
+    document.getElementById('fareForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const payload = {
+            pickup_latitude: pickupCoords[0],
+            pickup_longitude: pickupCoords[1],
+            dropoff_latitude: dropoffCoords[0],
+            dropoff_longitude: dropoffCoords[1],
+            passenger_count: document.getElementById('passenger_count').value,
+            pickup_datetime: document.getElementById('pickup_datetime').value
+        };
+
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const res = await response.json();
+
+        if (res.status === 'success') {
+            document.getElementById('resultCard').classList.remove('hidden');
+            document.getElementById('res_fare').innerText = res.predicted_fare;
+            document.getElementById('res_dist').innerText = res.distance_miles;
+            document.getElementById('res_surcharge').innerText = res.details.peak_surcharge;
+        } else {
+            alert('Error predicting fare: ' + res.message);
+        }
+    });
+
+    // Initial sync call
+    updateMapState();
+</script>
+</body>
+</html>

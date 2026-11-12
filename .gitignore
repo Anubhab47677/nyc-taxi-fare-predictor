@@ -1,0 +1,20 @@
+# Python / Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Datasets (Keep repo lightweight)
+*.csv
+*.zip
+data/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# IDE & OS files
+.vscode/
+.DS_Store
+Thumbs.db
