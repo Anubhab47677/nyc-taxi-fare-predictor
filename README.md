@@ -2,132 +2,262 @@
 
 # 🚕 NYC Taxi Fare AI Predictor
 
-### End-to-End Deep Learning Regression & Interactive Geospatial Web Application
+### Deep Learning Regression Research & Interactive Geospatial Fare Estimation
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.20.0-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
 [![Keras](https://img.shields.io/badge/Keras-Sequential_DNN-D00000?style=for-the-badge&logo=keras&logoColor=white)](https://keras.io/)
-[![Flask](https://img.shields.io/badge/Flask-3.0+-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Leaflet.js](https://img.shields.io/badge/Leaflet.js-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Flask](https://img.shields.io/badge/Flask-3.0%2B-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Leaflet](https://img.shields.io/badge/Leaflet.js-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](#license)
 
-*An intelligent full-stack predictive analytics platform combining Deep Neural Networks, geodesic spatial feature engineering, and NYC Taxi & Limousine Commission (TLC) tariff modeling inside a real-time interactive map interface.*
+**An end-to-end NYC taxi fare estimation project** combining geospatial feature engineering, a TensorFlow/Keras regression workflow, and an interactive Flask web application.
 
-[Project Overview](#project-overview) • [Dashboard Preview](#dashboard-preview) • [Core Capabilities](#core-capabilities) • [System Architecture](#system-architecture) • [ML Pipeline](#ml-pipeline) • [Tech Stack](#tech-stack) • [API Documentation](#api-documentation) • [Roadmap](#roadmap) • [Project Structure](#project-structure) • [Installation](#installation)
+[Overview](#-project-overview) · [Features](#-features) · [Screenshots](#-screenshots) · [Architecture](#-system-architecture) · [Machine Learning](#-machine-learning-workflow) · [API](#-api-documentation) · [Installation](#-installation) · [Roadmap](#-roadmap)
 
 </div>
 
 ---
 
-<a name="project-overview"></a>
 ## 📋 Project Overview
 
-Estimating urban taxi fares accurately requires modeling complex non-linear interactions between **geospatial coordinates**, **temporal traffic patterns**, **regulatory surcharges**, and **airport flat-rate zones**. Simple straight-line distance approximations often fail to account for New York City's dynamic borough boundaries, rush-hour congestion tariffs, and major transit hubs.
+Estimating taxi fares involves more than measuring the distance between two points. Pickup and drop-off locations, trip timing, passenger information, airport zones, and local fare rules can all affect the final amount.
 
-**NYC Taxi Fare AI Predictor** solves this problem through a two-tier architecture:
-1. **Offline Deep Learning Research Pipeline (`NYC_Taxi_Fare_Prediction.ipynb`):** Performs large-scale data ingestion, statistical anomaly pruning, spatial-temporal feature extraction, and supervised regression training using a multi-layer Keras Deep Neural Network (DNN).
-2. **Real-Time Full-Stack Inference Engine (`app.py` & `templates/index.html`):** Exposes a low-latency Flask REST API paired with an interactive Leaflet.js map dashboard, enabling users to drop or drag pickup and drop-off pins across New York City and receive instant fare, distance, and surcharge breakdowns.
+**NYC Taxi Fare AI Predictor** explores this problem through two connected parts:
 
----
+1. **Machine Learning research pipeline — `NYC_Taxi_Fare_Prediction.ipynb`**  
+   A Jupyter Notebook for dataset inspection, cleaning, exploratory analysis, geospatial and temporal feature engineering, and training/evaluating a Keras Deep Neural Network (DNN) regression model.
 
-<a name="dashboard-preview"></a>
-## 📸 Dashboard Preview
+2. **Interactive web application — `app.py`**  
+   A Flask application with a Leaflet.js map interface. Users can select pickup and drop-off coordinates, specify trip details, and request a fare estimate through a JSON API.
+
+> **Implementation note:** The notebook contains the DNN training workflow. The documented Flask prediction flow currently performs geodesic distance and tariff/surcharge calculations. Exporting and integrating the trained model and fitted scaler into the live application is listed as a future enhancement.
+
+## ✨ Features
+
+### 1. Interactive map
+
+- Select pickup and drop-off locations directly on an OpenStreetMap-powered map.
+- Drag existing markers to adjust trip coordinates.
+- Display a route line between the selected points.
+- View and synchronize pickup/drop-off latitude and longitude values.
+- Reset the map to the default Times Square-to-JFK example route.
+
+### 2. Geospatial calculations
+
+- Calculate great-circle distance using the Haversine formula.
+- Display trip distance in both kilometres and miles.
+- Check proximity to JFK, LaGuardia (LGA), and Newark Liberty (EWR) airport coordinates.
+- Apply the documented airport proximity rule when a trip endpoint is within the configured 2 km radius.
+
+### 3. Fare and surcharge estimation
+
+The application includes the following fare components in its documented tariff calculation:
+
+| Component | Amount / Rule |
+|---|---:|
+| Base fare | $3.00 |
+| Distance rate | $3.30 per mile |
+| Minimum fare | $2.50 |
+| Weekday peak surcharge | $2.50 |
+| Overnight surcharge | $1.00 |
+| Airport proximity radius | 2.0 km |
+
+- **Weekday peak period:** Monday–Friday, 4:00 PM–8:00 PM.
+- **Overnight period:** 8:00 PM–6:00 AM.
+- The API response provides the estimated fare, trip distance, pickup time, passenger count, and surcharge details.
+
+*These values describe the tariff rules implemented/documented in this project; verify current official NYC TLC rates before using the estimate for real-world pricing.*
+
+### 4. Machine Learning workflow
+
+- Reproducible experiment setup using random seed `42`.
+- Dataset cleaning and invalid-record filtering.
+- Geospatial and time-based feature engineering.
+- Keras Sequential DNN regression model.
+- Evaluation using MAE, MSE, and R².
+- Training callbacks including EarlyStopping and ReduceLROnPlateau.
+
+## 📸 Screenshots
 
 <div align="center">
 
-### 🗺️ Interactive Geospatial Map & Trip Parameter Controls
-*Users can click anywhere on the OpenStreetMap canvas or drag markers dynamically to set exact coordinates, passenger counts, and pickup timestamps.*
+### Interactive dashboard and map
 
-<img src="assets/dashboard-preview.png" alt="NYC Taxi Fare AI Predictor - Interactive Map Dashboard" width="92%"/>
+<img src="assets/dashboard-preview.png" alt="NYC Taxi Fare AI Predictor dashboard showing the interactive map" width="92%">
 
-<br/><br/>
+### Route selection and fare estimate
 
-### 💵 Real-Time Fare Estimation & Surcharge Breakdown
-*Instantaneous calculation displaying total estimated fare, geodesic trip distance in miles, and active NYC TLC peak/overnight surcharges.*
-
-<img src="assets/route-selection.png" alt="NYC Taxi Fare AI Predictor - Route & Fare Calculation" width="92%"/>
+<img src="assets/route-selection.png" alt="Selected taxi route and fare estimation result" width="92%">
 
 </div>
 
----
+## 🏗️ System Architecture
 
-<a name="core-capabilities"></a>
-## 🌟 Core Capabilities & Features
-
-### 1. Interactive Geospatial Mapping (`Leaflet.js` + `OpenStreetMap`)
-- **Dual-Mode Coordinate Selection:** Alternate-click directly on the map canvas to place **Pickup** and **Dropoff** markers, or click-and-drag existing pins for fine-grained street-level adjustments.
-- **Live Vector Polyline Rendering:** Automatically draws and updates a dashed trajectory vector connecting origin and destination coordinates on every drag or click event.
-- **One-Click State Reset:** Instantly restores default Manhattan (Times Square) to JFK Airport coordinates and recenters the viewport.
-
-### 2. Geodesic Spatial Engineering Engine
-- **Great-Circle Distance Computation:** Calculates exact spherical surface distance between pickup and drop-off latitude/longitude pairs in both kilometers and miles.
-- **Airport Hub Geofencing:** Evaluates proximity against coordinates for **John F. Kennedy International Airport (JFK)**, **LaGuardia Airport (LGA)**, and **Newark Liberty International Airport (EWR)** to trigger flat-rate airport tariff logic when within a `2.0 km` radius.
-
-### 3. Dynamic NYC TLC Tariff & Temporal Surcharge Logic
-- **Weekday Rush-Hour Detection:** Parses ISO-8601 datetime strings to detect weekday peak congestion windows (`Monday–Friday, 4:00 PM – 8:00 PM`) and applies the standard `$2.50` peak surcharge.
-- **Overnight Tariff Evaluation:** Identifies late-night and early-morning trips (`8:00 PM – 6:00 AM`) and factors in the `$1.00` overnight surcharge.
-- **Base & Distance Metering:** Combines a `$3.00` initial flag-drop base fare with `$3.30/mile` metered progression and a `$2.50` minimum fare floor.
-
-### 4. Reproducible Deep Learning Training Pipeline
-- **Deterministic Execution:** Enforces global random seed `42` across `numpy`, `random`, and `tensorflow` for reproducible experiments.
-- **Comprehensive Outlier Sanitization:** Eliminates negative/zero fares, unpopulated passenger entries, and corrupted GPS coordinates outside the NYC metropolitan bounding box.
-
----
-
-<a name="system-architecture"></a>
-## 🏗️ System Architecture & Data Flow
-
-The application follows a decoupled **Client–Server–Inference** architecture designed for fast asynchronous JSON communication without page reloads:
+The project separates model experimentation from web-based fare estimation.
 
 ```text
-+-----------------------------------------------------------------------------------+
-|                        CLIENT LAYER (Browser / Frontend)                          |
-|                                                                                   |
-|  +-------------------------------------+   +-----------------------------------+  |
-|  |     Interactive Leaflet.js Map      |   |       Trip Configuration Form     |  |
-|  |  • Draggable Pickup/Dropoff Pins    |   |  • ISO Datetime Picker            |  |
-|  |  • Click-to-Place Event Listeners   |   |  • Passenger Count Selector (1-5) |  |
-|  |  • Dynamic Geodesic Polyline        |   |  • Live Lat/Lon Coordinate Sync   |  |
-|  +------------------+------------------+   +-----------------+-----------------+  |
-|                     |                                        |                    |
-|                     +-------------------+--------------------+                    |
-|                                         |                                         |
-|                            Async Fetch API (POST /predict)                        |
-|                            Content-Type: application/json                         |
-+-----------------------------------------|-----------------------------------------+
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
-|                      APPLICATION LAYER (Flask Backend - app.py)                   |
-|                                                                                   |
-|  +-----------------------------------------------------------------------------+  |
-|  |                        Request Validation & Parsing                         |  |
-|  |  • Extracts float coordinates, integer passenger count, & datetime object   |  |
-|  +--------------------------------------+--------------------------------------+  |
-|                                         |                                         |
-|                                         v                                         |
-|  +--------------------------------------+--------------------------------------+  |
-|  |                   Feature Engineering & Tariff Engine                       |  |
-|  |  1. Haversine Formula -> Great-Circle Distance (km & miles)                 |  |
-|  |  2. Airport Proximity -> Min distance to JFK (40.6413, -73.7781) & LGA      |  |
-|  |  3. Temporal Parser   -> Weekday Peak (16:00-20:00) & Night (20:00-06:00)   |  |
-|  +--------------------------------------+--------------------------------------+  |
-|                                         |                                         |
-|                                         v                                         |
-|  +--------------------------------------+--------------------------------------+  |
-|  |                     Prediction & Response Serializer                        |  |
-|  |  • Computes final metered/flat-rate fare & returns structured JSON payload  |  |
-|  +--------------------------------------+--------------------------------------+  |
-+-----------------------------------------|-----------------------------------------+
-                                          |
-                              JSON Response (HTTP 200)
-                                          |
-                                          v
-+-----------------------------------------------------------------------------------+
+                         MACHINE LEARNING WORKFLOW
+                 NYC_Taxi_Fare_Prediction.ipynb
+                               |
+                 Dataset loading and exploration
+                               |
+                    Cleaning and preprocessing
+                               |
+              Geospatial and temporal feature work
+                               |
+                    DNN training and evaluation
+                               |
+                   Model export (planned integration)
 
-🧠 Machine Learning & Mathematical Pipeline1. Dataset Characteristics & Sanitization (NYC_Taxi_Fare_Prediction.ipynb)Dataset Source: Kaggle New York City Taxi Fare Prediction dataset (100,000 sampled records across 8 raw columns: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count).Statistical Profile: Raw target fare_amount spans from -$44.90 to $200.00 (mean $11.35, std $9.72), necessitating strict domain-driven cleaning rules:Fare Validity Filter: fare_amount > $0NYC Metropolitan Bounding Box:$$\text{Latitude} \in [40.50^\circ, 40.90^\circ], \quad \text{Longitude} \in [-74.25^\circ, -73.70^\circ]$$Passenger Count Filter: passenger_count >= 12. Geodesic Distance Formulation (Haversine Equation)To compute accurate surface distance between two coordinates $(\phi_1, \lambda_1)$ and $(\phi_2, \lambda_2)$ on Earth ($R = 6371.0\text{ km}$):$$a = \sin^2\left(\frac{\Delta\phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta\lambda}{2}\right)$$$$d_{\text{km}} = 2R \cdot \text{atan2}\left(\sqrt{a}, \sqrt{1 - a}\right), \quad d_{\text{miles}} = d_{\text{km}} \times 0.621371$$3. Deep Neural Network (DNN) ArchitectureThe regression model is implemented using the TensorFlow 2.20 / Keras Sequential API:Pipeline StageConfiguration & DetailsInput LayerNormalized spatial coordinates, engineered geodesic distances, passenger count, and cyclical/extracted temporal featuresHidden LayersMulti-layer Dense blocks with ReLU activations for non-linear spatial representationRegularization & StabilityBatchNormalization layers to stabilize internal covariate shift + Dropout layers to prevent overfitting on high-variance tripsOutput LayerSingle linear Dense(1) neuron outputting continuous fare_amountOptimizers EvaluatedAdam, RMSprop, and SGDTraining CallbacksEarlyStopping (monitors validation loss) & ReduceLROnPlateau (adaptive learning rate decay)Evaluation MetricsMean Absolute Error (MAE), Mean Squared Error (MSE), and Coefficient of Determination (R²)🛠️ Complete Technology StackCategoryTechnologyVersion / PurposeCore LanguagePython3.12 — Primary language for ML modeling and backend APIDeep LearningTensorFlow / Keras2.20.0 — Sequential DNN construction, training, and evaluationData ProcessingNumPy & Pandas1.26.4+ / 2.2.0+ — Vectorized math and tabular data manipulationML UtilitiesScikit-Learn & Joblib1.4.0+ / 1.3.2+ — Train/test splitting, scaling, and metric computationWeb FrameworkFlask3.0.2+ — Lightweight WSGI web server and RESTful routingMapping EngineLeaflet.js & OpenStreetMap1.9.4 — Interactive map rendering, markers, and vector polylinesUI Styling & IconsTailwind CSS & Lucide Icons3.4 (CDN) — Utility-first dark-mode glassmorphic UI components🔌 REST API DocumentationPredict Taxi Fare: POST /predictComputes estimated fare, geodesic distance, and applicable time-of-day surcharges from JSON trip parameters.Request HeadersHTTPContent-Type: application/json
-Request Payload ExampleJSON{
+
+                           WEB APPLICATION
+                               |
+                 Browser: HTML / Tailwind / Leaflet
+                               |
+                  User selects trip coordinates
+                               |
+                   Fetch API: POST /predict
+                               |
+                        Flask backend
+                             app.py
+                               |
+                 Validate and parse request data
+                               |
+                  Haversine distance calculation
+                               |
+              Airport proximity and time surcharge rules
+                               |
+                    Fare estimate and JSON response
+                               |
+                  Dashboard displays trip results
+```
+
+### Request flow
+
+1. The user selects pickup and drop-off locations on the map.
+2. The frontend sends the coordinates, passenger count, and pickup datetime to `POST /predict`.
+3. Flask validates and parses the submitted values.
+4. The backend calculates the geodesic distance and evaluates the configured tariff rules.
+5. The API returns a JSON response for the dashboard to display.
+
+## 🧠 Machine Learning Workflow
+
+### Dataset
+
+The project notebook uses the **Kaggle New York City Taxi Fare Prediction** dataset. The documented experiment uses a sample of approximately 100,000 records.
+
+The raw dataset fields include:
+
+| Column | Description |
+|---|---|
+| `key` | Record identifier |
+| `fare_amount` | Recorded taxi fare; prediction target |
+| `pickup_datetime` | Pickup date and time |
+| `pickup_longitude` | Pickup longitude |
+| `pickup_latitude` | Pickup latitude |
+| `dropoff_longitude` | Drop-off longitude |
+| `dropoff_latitude` | Drop-off latitude |
+| `passenger_count` | Number of passengers |
+
+### Data cleaning
+
+The notebook applies domain-based filtering to remove invalid records, including:
+
+- Non-positive fare values.
+- Missing or invalid passenger-count values.
+- Coordinates outside the defined NYC metropolitan bounding box.
+
+The documented geographic bounds are:
+
+\[
+40.50 \leq \text{latitude} \leq 40.90
+\]
+
+\[
+-74.25 \leq \text{longitude} \leq -73.70
+\]
+
+The notebook also examines the target fare distribution and outliers before model training.
+
+### Geospatial feature engineering: Haversine formula
+
+The Haversine formula estimates the great-circle distance between two latitude/longitude coordinates on a spherical Earth.
+
+For pickup \((\phi_1,\lambda_1)\) and drop-off \((\phi_2,\lambda_2)\), with angles expressed in radians:
+
+\[
+a = \sin^2\left(\frac{\Delta\phi}{2}\right)
++ \cos(\phi_1)\cos(\phi_2)
+\sin^2\left(\frac{\Delta\lambda}{2}\right)
+\]
+
+\[
+d_{\text{km}} =
+2R \cdot \operatorname{atan2}
+\left(\sqrt{a},\sqrt{1-a}\right)
+\]
+
+Where:
+
+- \(R = 6371.0\) km is the Earth's approximate radius.
+- \(\Delta\phi = \phi_2-\phi_1\).
+- \(\Delta\lambda = \lambda_2-\lambda_1\).
+
+Convert kilometres to miles using:
+
+\[
+d_{\text{miles}} = d_{\text{km}} \times 0.621371
+\]
+
+### Deep Neural Network
+
+The notebook builds a regression model using the TensorFlow/Keras Sequential API.
+
+| Stage | Description |
+|---|---|
+| Input | Normalized coordinates, engineered distance, passenger count, and temporal features |
+| Hidden layers | Dense layers with ReLU activation |
+| Regularization | Batch Normalization and Dropout |
+| Output | One linear neuron for continuous fare prediction |
+| Optimizers explored | Adam, RMSprop, and SGD |
+| Training callbacks | EarlyStopping and ReduceLROnPlateau |
+| Evaluation | MAE, MSE, and R² |
+
+The exact layer sizes and experiment-specific results should be taken from the notebook rather than inferred from this overview.
+
+## 🛠️ Technology Stack
+
+| Category | Technology | Purpose |
+|---|---|---|
+| Language | Python 3.10+ | Notebook experiments and backend |
+| Deep learning | TensorFlow 2.20 / Keras | DNN regression workflow |
+| Data processing | NumPy, Pandas | Data manipulation and numerical operations |
+| ML utilities | Scikit-learn, Joblib | Preprocessing, splitting, scaling, and evaluation |
+| Backend | Flask 3.0+ | Web server and REST API |
+| Frontend | HTML, JavaScript | Dashboard interface and client-side interactions |
+| Map | Leaflet.js 1.9.4 | Interactive map and markers |
+| Map tiles | OpenStreetMap | Map display |
+| Styling | Tailwind CSS 3.4 | Responsive UI styling |
+| Icons | Lucide Icons | Interface icons |
+
+## 🔌 API Documentation
+
+### `POST /predict`
+
+Calculates an estimated taxi fare and returns trip distance and surcharge details.
+
+**Request headers**
+
+```http
+Content-Type: application/json
+```
+
+**Request body**
+
+```json
+{
   "pickup_latitude": 40.7580,
   "pickup_longitude": -73.9855,
   "dropoff_latitude": 40.6413,
@@ -135,7 +265,23 @@ Request Payload ExampleJSON{
   "passenger_count": 2,
   "pickup_datetime": "2026-11-12T17:30"
 }
-Parameter ReferenceFieldTypeRequiredDescriptionpickup_latitudefloatYesOrigin latitude in decimal degrees (e.g., 40.7580)pickup_longitudefloatYesOrigin longitude in decimal degrees (e.g., -73.9855)dropoff_latitudefloatYesDestination latitude in decimal degrees (e.g., 40.6413)dropoff_longitudefloatYesDestination longitude in decimal degrees (e.g., -73.7781)passenger_countintegerYesNumber of passengers (1 to 5+)pickup_datetimestringYesISO-8601 local timestamp formatted as YYYY-MM-DDTHH:MMSuccessful Response (200 OK)JSON{
+```
+
+### Request parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `pickup_latitude` | Float | Yes | Pickup latitude in decimal degrees |
+| `pickup_longitude` | Float | Yes | Pickup longitude in decimal degrees |
+| `dropoff_latitude` | Float | Yes | Drop-off latitude in decimal degrees |
+| `dropoff_longitude` | Float | Yes | Drop-off longitude in decimal degrees |
+| `passenger_count` | Integer | Yes | Number of passengers |
+| `pickup_datetime` | String | Yes | Pickup time in `YYYY-MM-DDTHH:MM` format |
+
+### Successful response — `200 OK`
+
+```json
+{
   "status": "success",
   "predicted_fare": "$72.50",
   "distance_miles": "13.48 mi",
@@ -147,45 +293,126 @@ Parameter ReferenceFieldTypeRequiredDescriptionpickup_latitudefloatYesOrigin lat
     "passengers": 2
   }
 }
-Error Response (400 Bad Request)JSON{
+```
+
+*The values above illustrate the documented response structure; they are not a guaranteed result for every run.*
+
+### Error response — `400 Bad Request`
+
+```json
+{
   "status": "error",
   "message": "Invalid coordinate or datetime format provided."
 }
-🔮 Roadmap & Future Enhancements[ ] Direct .keras Model Serialization: Export the trained Keras DNN weights (model.keras) and fitted StandardScaler (scaler.pkl) from the notebook into app.py for hybrid DNN + tariff ensemble inference.[ ] Road-Network Routing Integration: Connect to the OSRM (Open Source Routing Machine) API to trace real Manhattan street grids and compute driving distance/duration instead of straight-line geodesic vectors.[ ] NYC Borough GeoJSON Overlays: Render interactive boundaries for Manhattan, Brooklyn, Queens, The Bronx, and Staten Island with historical fare density heatmaps.[ ] Containerized Cloud Deployment: Add a Dockerfile and gunicorn production WSGI configuration for deployment on Render, Railway, or AWS EC2.📂 Project StructurePlaintextnyc-taxi-fare-predictor/
+```
+
+## 📂 Project Structure
+
+```text
+nyc-taxi-fare-predictor/
 │
-├── assets/                                # Documentation visual assets
-│   ├── dashboard-preview.png              # Full dark-mode dashboard & interactive map view
-│   └── route-selection.png                # Live route selection & fare output card view
+├── assets/
+│   ├── dashboard-preview.png       # Dashboard screenshot
+│   └── route-selection.png         # Route and fare result screenshot
 │
-├── static/                                # Static frontend assets
+├── static/
 │   ├── css/
-│   │   └── style.css                      # Custom stylesheet overrides
+│   │   └── style.css               # Custom stylesheet
 │   └── js/
-│       └── main.js                        # Modular client-side scripts
+│       └── main.js                 # Frontend interactions
 │
-├── templates/                             # Jinja2 HTML templates
-│   └── index.html                         # Complete interactive dashboard (Tailwind + Leaflet.js)
+├── templates/
+│   └── index.html                  # Main dashboard template
 │
-├── app.py                                 # Flask web server, Haversine engine & /predict REST API
-├── NYC_Taxi_Fare_Prediction.ipynb         # Jupyter Notebook: EDA, cleaning & Keras DNN training
-├── requirements.txt                       # Python package dependencies
-├── .gitignore                             # Excludes __pycache__, venv, checkpoints & raw CSVs
-└── README.md                              # Comprehensive project documentation
-🚀 Installation & Local DeploymentPrerequisitesPython: Version 3.10, 3.11, or 3.12Package Manager: pip (latest version recommended)Browser: Any modern browser (Chrome, Edge, Firefox, Safari)Step-by-Step SetupClone the RepositoryBashgit clone [https://github.com/Anubhab47677/nyc-taxi-fare-predictor.git](https://github.com/Anubhab47677/nyc-taxi-fare-predictor.git)
+├── app.py                          # Flask server and /predict API
+├── NYC_Taxi_Fare_Prediction.ipynb  # EDA, preprocessing, and DNN workflow
+├── requirements.txt                # Python dependencies
+├── .gitignore                      # Git ignore rules
+└── README.md                        # Project documentation
+```
+
+## 🚀 Installation
+
+### Prerequisites
+
+- Python 3.10, 3.11, or 3.12.
+- `pip`.
+- Git.
+- A modern web browser.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Anubhab47677/nyc-taxi-fare-predictor.git
 cd nyc-taxi-fare-predictor
-Create and Activate a Virtual Environment (Recommended)Bash# Create virtual environment
+```
+
+### 2. Create a virtual environment
+
+**Windows — PowerShell**
+
+```powershell
 python -m venv venv
-
-# Activate on Windows (PowerShell)
 .\venv\Scripts\Activate.ps1
+```
 
-# Activate on macOS / Linux
+**macOS / Linux**
+
+```bash
+python3 -m venv venv
 source venv/bin/activate
-Install DependenciesBashpip install -r requirements.txt
-Launch the Flask ServerBashpython app.py
-You should see output confirming the server is active on port 5000:Plaintext* Running on [http://127.0.0.1:5000](http://127.0.0.1:5000)
-Access the Web Application
-Open your browser and navigate to http://127.0.0.1:5000.📄 LicenseThis project is open-source and available under the MIT License.Developed by AnubhabIf you found this project useful, please consider giving it a ⭐ on GitHub!
-|                     UI PRESENTATION LAYER (Tailwind CSS Card)                     |
-|  • Updates Predicted Fare ($), Trip Distance (mi), and Surcharge Breakdown ($)    |
-+-----------------------------------------------------------------------------------+
+```
+
+### 3. Install dependencies
+
+```bash
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 4. Run the application
+
+```bash
+python app.py
+```
+
+### 5. Open the dashboard
+
+Visit:
+
+```text
+http://127.0.0.1:5000
+```
+
+The Flask development server should now serve the interactive taxi fare estimation dashboard.
+
+## 🗺️ Roadmap
+
+- [ ] **Integrate the trained DNN into live inference:** Export the trained Keras model and fitted preprocessing scaler, then connect them to the Flask prediction flow.
+- [ ] **Road-network routing:** Integrate OSRM or another routing service to estimate road distance and travel duration instead of relying only on straight-line geodesic distance.
+- [ ] **NYC borough overlays:** Add GeoJSON boundaries for Manhattan, Brooklyn, Queens, The Bronx, and Staten Island.
+- [ ] **Fare visualizations:** Add historical fare-density and trip-analysis heatmaps.
+- [ ] **Production deployment:** Add Docker and a production WSGI server such as Gunicorn, then configure deployment for a hosting platform.
+
+## ⚠️ Notes and Limitations
+
+- Haversine distance is a straight-line surface distance; it is not the actual road distance travelled by a taxi.
+- Fare estimates depend on the tariff values and rules configured in the application. They should not be treated as official quotes.
+- The notebook's trained DNN is a research/training component until model serialization and integration into the Flask inference path are completed.
+- Keep large datasets, virtual environments, generated model files, and other local artifacts out of Git unless they are intentionally part of the repository.
+
+## 📄 License
+
+This project is available under the **MIT License**. See the `LICENSE` file if included in the repository.
+
+---
+
+<div align="center">
+
+### Developed by Anubhab
+
+If you find this project useful, consider giving the repository a ⭐ on GitHub.
+
+[GitHub Repository](https://github.com/Anubhab47677/nyc-taxi-fare-predictor)
+
+</div>
