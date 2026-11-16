@@ -407,8 +407,6 @@ This project is available under the **MIT License**. See the `LICENSE` file if i
 
 ---
 
-<div align="center">
-
 ## Author
 
 **Anubhab Samantaray**
