@@ -401,12 +401,6 @@ The Flask development server should now serve the interactive taxi fare estimati
 - The notebook's trained DNN is a research/training component until model serialization and integration into the Flask inference path are completed.
 - Keep large datasets, virtual environments, generated model files, and other local artifacts out of Git unless they are intentionally part of the repository.
 
-## 📄 License
-
-This project is available under the **MIT License**. See the `LICENSE` file if included in the repository.
-
----
-
 ## Author
 
 **Anubhab Samantaray**
@@ -415,5 +409,9 @@ This project is available under the **MIT License**. See the `LICENSE` file if i
 - LinkedIn: [Anubhab Samantaray](https://www.linkedin.com/in/anubhab-samantaray/)
 
 Computer Science & Engineering — Artificial Intelligence and Machine Learning
+
+## 📄 License
+
+This project is available under the **MIT License**. See the `LICENSE` file if included in the repository.
 
 </div>
