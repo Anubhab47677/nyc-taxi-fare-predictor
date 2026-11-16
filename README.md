@@ -409,10 +409,13 @@ This project is available under the **MIT License**. See the `LICENSE` file if i
 
 <div align="center">
 
-### Developed by Anubhab
+## Author
 
-If you find this project useful, consider giving the repository a ⭐ on GitHub.
+**Anubhab Samantaray**
 
-[GitHub Repository](https://github.com/Anubhab47677/nyc-taxi-fare-predictor)
+- GitHub: [@Anubhab47677](https://github.com/Anubhab47677)
+- LinkedIn: [Anubhab Samantaray](https://www.linkedin.com/in/anubhab-samantaray/)
+
+Computer Science & Engineering — Artificial Intelligence and Machine Learning
 
 </div>
